@@ -4,7 +4,7 @@
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 id: immunizationfhirig
-canonical: urn://example.com/seirfhirig/fhir
+canonical: urn://example.com/immunizationfhirig/fhir
 name: Draft Immunization FHIR IG
 title: Draft Immunization FHIR Implementation Guide
 description: This implementation guide is provided to support the use of FHIR®© in an Philippines context and Immunization usecase, and defines the minimum set of constraints on the FHIR resources to create the Immunization related profiles.
@@ -24,6 +24,11 @@ publisher:
 # package id and the value is the version (or dev/current). For advanced
 # use cases, the value can be an object with keys for id, uri, and version.
 #
+
+dependencies:
+  example.fhir.ph.core: current
+
+
 # dependencies:
 #   hl7.fhir.us.core: 3.1.0
 #   hl7.fhir.us.mcode:
