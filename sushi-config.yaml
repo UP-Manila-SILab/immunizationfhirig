@@ -74,7 +74,9 @@ menu:
   Home: index.html
   Artifacts: artifacts.html
   Change Logs: changelog.html
-  
+  Other IDs: otherids.html
+  Work Flow: workflows.html
+
 
 # ╭───────────────────────────Less Common Implementation Guide Properties──────────────────────────╮
 # │  Uncomment the properties below to configure additional properties on the ImplementationGuide  │
