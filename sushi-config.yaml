@@ -4,7 +4,7 @@
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 id: up-manila-silab.immunizationfhirig
-canonical: "https://up-manila-silab.github.io/immunizationfhirig"
+canonical: https://up-manila-silab.github.io/immunizationfhirig
 name: Immunization FHIR IG
 title: Draft Immunization FHIR Implementation Guide
 description: This draft implementation guide is provided to support the use of FHIR®© in an Philippines context and Immunization usecase, and defines the minimum set of constraints on the FHIR resources to create the Immunization related profiles.
