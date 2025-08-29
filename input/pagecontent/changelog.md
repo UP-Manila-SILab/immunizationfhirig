@@ -71,7 +71,7 @@ To help implementers, only the more significant changes are listed here.
 **SEIR Transcation Flow**
 
 # SEIR Process Flow
-<img style="width:100%" src="emr-seir-flow.png" alt="SEIR Process Flow" />
+<!-- <img style="width:100%" src="emr-seir-flow.png" alt="SEIR Process Flow" /> -->
 <figcaption ALIGN="CENTER">SEIR Process Flow</figcaption>
 
 ## Change Log
