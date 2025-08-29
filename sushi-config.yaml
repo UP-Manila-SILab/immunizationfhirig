@@ -73,7 +73,7 @@ dependencies:
 menu:
   Home: index.html
   Artifacts: artifacts.html
-  Change Logs: changelogs.html
+  Changelog: changelog.html
   Other IDs: otherids.html
   Work Flow: workflow.html
 
