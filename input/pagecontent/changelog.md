@@ -19,7 +19,7 @@ To help implementers, only the more significant changes are listed here.
 1. ✅ Updated Data Elements and Requirements from NIP  
 2. ✅ SEIR transaction flow (including diagrams)  
 3. ✅ Search parameters  
-4. 🕒 Versioning PSGC (for Go Live) – *Pending*  
+4. ✅ Versioning PSGC (for Go Live)
 5. ✅ CapabilityStatement 
 
 ### From NIP:
@@ -70,9 +70,12 @@ To help implementers, only the more significant changes are listed here.
 
 **SEIR Transcation Flow**
 
-# SEIR Process Flow
-<img style="width:100%" src="emr-seir-flow.png" alt="SEIR Process Flow" />
-<figcaption ALIGN="CENTER">SEIR Process Flow</figcaption>
+-Communication Flow between EMR and SEIR FHIR System
+- [View SEIR Process Flow](workflow.html)
+
+#### Updated Values (as of 2025-08-26)
+
+-The PSGC-captured versions range from the most latest version to 2023.
 
 ## Change Log
 
@@ -85,5 +88,5 @@ To help implementers, only the more significant changes are listed here.
 | 2025-07-17 | NIP data elements updated; search parameters added.                                           |
 | 2025-07-21 | SEIR transaction flow,                                                                        |
 | 2025-07-21 | CapabilityStatement                                                                           |
-|            | PSGC versioning – *still pending*.                                                            |
+| 2025-8-26  | PSGC versioning – captured version is 2023                                                    |
 |------------|-----------------------------------------------------------------------------------------------|
