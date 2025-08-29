@@ -70,7 +70,7 @@ To help implementers, only the more significant changes are listed here.
 
 **SEIR Transcation Flow**
 
-<!-- ![Communication Flow between EMR and SEIR FHIR System](../images/emr-seir-flow.png) -->
+![Communication Flow between EMR and SEIR FHIR System](emr-seir-flow.png)
 
 ## Change Log
 
