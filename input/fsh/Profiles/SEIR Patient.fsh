@@ -21,6 +21,3 @@ Description: "A profile for Patient resource specific to Philippine context."
 * name.given[middle] ^short = "Middle name(s)"
 
 * extension contains indigenous-member 0..1
-* extension[indigenous-member].valueBoolean 1..1
-* extension[indigenous-member] ^short = "Indigenous Member"
-* extension[indigenous-member] ^definition = "Indicates whether the patient is a member of an indigenous group."
