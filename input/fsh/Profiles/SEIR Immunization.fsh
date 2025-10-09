@@ -5,7 +5,6 @@ Parent: Immunization
 Id: seir-immunization
 Title: "SEIR Immunization"
 Description: "A profile for Immunization resource specific to Philippine context."
-* ^url = "urn://example.com.ph/StructureDefinition/ph-immunization"
 * ^version = "1.0.0"
 * ^status = #draft
 

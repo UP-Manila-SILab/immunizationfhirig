@@ -5,53 +5,22 @@ Parent: Patient
 Id: seir-patient
 Title: "SEIR Patient"
 Description: "A profile for Patient resource specific to Philippine context."
-* ^url = "urn://example.com.ph/StructureDefinition/ph-patient"
 * ^version = "1.0.0"
 * ^status = #draft
 
-// Reference to PH Core FHIR IG
-* patient 1..1
-* patient only Reference(Patient)
-* patient ^short = "Patient receiving immunization"
-
-* encounter 0..1
-* encounter only Reference(Encounter)
-* encounter ^short = "Encounter during immunization"
-
-* location 0..1
-* location only Reference(Location)
-* location ^short = "Location resource specific to Philippine context."
-
 // Standalone in Immunization FHIR IG
 
-* vaccineCode 1..1
-* vaccineCode ^short = "Vaccine Generic Name (*eLMIS)"
+* name.family 1..1
+* name.given 1..*
+* name.given ^slicing.discriminator.type = #value
+* name.given ^slicing.discriminator.path = "$this"
+* name.given ^slicing.rules = #open
+* name.given contains first 1..* and middle 0..*
 
-* protocolApplied 0..*
-* protocolApplied.doseNumberPositiveInt 0..1
-* protocolApplied.doseNumberPositiveInt ^short = "Dose Count"
+* name.given[first] ^short = "First name"
+* name.given[middle] ^short = "Middle name(s)"
 
-* status 1..1
-* status ^short = "Action Taken"
-
-* statusReason 0..1
-* statusReason ^short = "Action Reason"
-
-* occurrenceDateTime 1..1
-* occurrenceDateTime ^short = "Action Date"
-
-* lotNumber 1..1
-* lotNumber ^short = "Vaccine lot number"
-
-* performer 0..*
-* performer.actor 1..1
-* performer.actor.display 0..1
-* performer.actor.display ^short = "Vaccinator Name"
-* performer.actor.display ^definition = "The display name of the vaccinator."
-
-* extension ^slicing.discriminator.type = #value
-* extension ^slicing.discriminator.path = "url"
-* extension ^slicing.rules = #open
-* extension contains
-    seir-administered-product named AdministeredProduct 0..1 MS and
-    seir-batch-number named BatchNumber 0..1 MS
+* extension contains indigenous-member 0..1
+* extension[indigenous-member].valueBoolean 1..1
+* extension[indigenous-member] ^short = "Indigenous Member"
+* extension[indigenous-member] ^definition = "Indicates whether the patient is a member of an indigenous group."
