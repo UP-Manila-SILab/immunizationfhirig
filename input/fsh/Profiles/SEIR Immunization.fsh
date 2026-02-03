@@ -1,26 +1,24 @@
 
 
 Profile: SEIRImmunizationProfile
-Parent: Immunization
+Parent: PHCoreImmunization
 Id: seir-immunization
 Title: "SEIR Immunization"
 Description: "A profile for Immunization resource specific to Philippine context."
-* ^url = "urn://example.com.ph/StructureDefinition/ph-immunization"
 * ^version = "1.0.0"
 * ^status = #draft
 
 // Reference to PH Core FHIR IG
-
 * patient 1..1
-* patient only Reference(PHCorePatient)
+* patient only Reference(Patient)
 * patient ^short = "Patient receiving immunization"
 
 * encounter 0..1
-* encounter only Reference(PHCoreEncounter)
+* encounter only Reference(Encounter)
 * encounter ^short = "Encounter during immunization"
 
 * location 0..1
-* location only Reference(PHCoreLocation)
+* location only Reference(Location)
 * location ^short = "Location resource specific to Philippine context."
 
 // Standalone in Immunization FHIR IG

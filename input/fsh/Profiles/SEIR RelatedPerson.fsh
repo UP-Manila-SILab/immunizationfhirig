@@ -1,5 +1,5 @@
 Profile: SEIRRelatedPersonProfile
-Parent: RelatedPerson
+Parent: PHCoreRelatedPerson
 Id: seir-relatedperson-profile
 Title: "SEIR RelatedPerson"
 Description: "A profile for RelatedPerson resource specific to Philippine context, particularly for mother's information."
