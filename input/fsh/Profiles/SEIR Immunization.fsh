@@ -1,7 +1,7 @@
 
 
 Profile: SEIRImmunizationProfile
-Parent: Immunization
+Parent: PHCoreImmunization
 Id: seir-immunization
 Title: "SEIR Immunization"
 Description: "A profile for Immunization resource specific to Philippine context."
