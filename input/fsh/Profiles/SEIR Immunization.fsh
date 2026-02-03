@@ -10,11 +10,11 @@ Description: "A profile for Immunization resource specific to Philippine context
 
 // Reference to PH Core FHIR IG
 * patient 1..1
-* patient only Reference(Patient)
+* patient only Reference(PHCorePatient)
 * patient ^short = "Patient receiving immunization"
 
 * encounter 0..1
-* encounter only Reference(Encounter)
+* encounter only Reference(PHCoreEncounter)
 * encounter ^short = "Encounter during immunization"
 
 * location 0..1

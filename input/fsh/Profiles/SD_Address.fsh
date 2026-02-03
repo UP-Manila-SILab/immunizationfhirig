@@ -1,5 +1,5 @@
 Profile: SEIR_Address
-Parent: PHCoreAddresss
+Parent: PHCoreAddress
 Id: seir-Address
 Title: "SEIR Address"
 Description: "A profile for the Address resource specific to Philippine context."
