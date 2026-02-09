@@ -10,7 +10,7 @@ Description: "A profile for Patient resource specific to Philippine context."
 
 // Standalone in Immunization FHIR IG
 * name.family 1..1 MS
-* name.given 1..*
+* name.given 1..* MS
 * name.given ^slicing.discriminator.type = #value
 * name.given ^slicing.discriminator.path = "$this"
 * name.given ^slicing.rules = #open
@@ -36,10 +36,12 @@ Description: "A profile for Patient resource specific to Philippine context."
 * identifier[PhilSysID].type.text = "PhilSys Identification Number"
 * identifier[PhilSysID] ^short = "PhilSys Identification Number"
 * identifier[PhilSysID] ^mustSupport = true
+* address 1..1 MS
+* address only SEIR_Address
 
 // Extensions
 * extension contains IndigenousMember named indigenousMember 1..1 MS
-* address only SEIR_Address
+
 
 // For Deletion 
 * link.modifierExtension ..0

@@ -5,7 +5,7 @@ Title: "SEIR Address"
 Description: "A profile for the Address resource specific to Philippine context."
 * id ..0
 * extension contains
-    Barangay named Barangay 0..1 and
+    Barangay named Barangay 0..1 MS and
     CityMunicipality named CityMunicipality 0..1 and
     Province named Province 0..1
 * city ..0

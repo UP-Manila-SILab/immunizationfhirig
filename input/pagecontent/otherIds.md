@@ -10,7 +10,7 @@
 | PPN | Passport Number | Patient.identifier |
 | EN | PEN - PhilHealth Employer Number | Organization.identifier |
 | AN | PAN - Accreditation Number | Organization.identifier |
-
+ 
 ---
 
 ## Patient ID's:
