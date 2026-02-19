@@ -41,10 +41,11 @@ jobs:
       - name: List IG folder 
         run: ls -l
 
-      - name: Build IG
-        run: |
-          cd PH-ImmunizationIG
-          java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini
+      - name: Copy IG to tools folder
+        run: cp -r PH-ImmunizationIG tools/
+
+      - name: Build PH-ImmunizationIG
+        run: java -Xmx4g -jar tools/publisher.jar -ig tools/PH-ImmunizationIG/ig.ini
 
       - name: Fail on QA errors
         run: |
