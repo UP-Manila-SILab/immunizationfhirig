@@ -19,9 +19,7 @@ jobs:
           java-version: 17
 
       - name: Build Immunization IG
-        run: |
-          cd IG/PH-ImmunizationIG
-          java -jar publisher.jar -ig ig.ini
+        run:  java -jar PH-ImmunizationIG/publisher.jar -ig PH-ImmunizationIG/ig.ini
 
       - name: Fail on QA errors
         run: |
