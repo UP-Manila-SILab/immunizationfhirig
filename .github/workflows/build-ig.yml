@@ -36,7 +36,7 @@ jobs:
             ${{ runner.os }}-fhir-packages-
 
       - name: Build IG
-        working-directory: ./IG/PH-ImmunizationIG
+        working-directory: ./PH-ImmunizationIG
         run: java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini
 
       - name: Fail on QA errors
