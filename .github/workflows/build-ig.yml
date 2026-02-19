@@ -38,7 +38,7 @@ jobs:
       - name: Show current directory
         run: pwd
 
-      - name: List IG folder
+      - name: List IG folder 
         run: ls -l
 
       - name: Build IG
