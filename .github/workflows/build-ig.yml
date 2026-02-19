@@ -1,0 +1,34 @@
+name: Build FHIR IG (TEST)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build Immunization IG
+        run: |
+          cd IG/Immunization
+          java -jar publisher.jar -ig ig.ini
+
+      - name: Build RoadSafety IG
+        run: |
+          cd ../../IG/RoadSafety
+          java -jar publisher.jar -ig ig.ini
+
+      - name: Fail on QA errors
+        run: |
+          grep -q "ERROR" IG/Immunization/output/qa.html && exit 1 || true
+          grep -q "ERROR" IG/RoadSafety/output/qa.html && exit 1 || true
