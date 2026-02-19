@@ -54,7 +54,8 @@ jobs:
 
       - name: List IG folder 
         run: ls -l
-
+      - name: Verify package in cache
+        run: ls -l ~/.fhir/packages/fhir.ph.core/1.0.0
       - name: Build IG
         run: |
           echo "Current directory: $PWD"
