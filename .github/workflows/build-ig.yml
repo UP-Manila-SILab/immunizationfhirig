@@ -42,7 +42,9 @@ jobs:
         run: ls -l
 
       - name: Build IG
-        run: java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini -ig PH-ImmunizationIG/ig.ini
+        run: |
+          cd PH-ImmunizationIG
+          java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini
 
       - name: Fail on QA errors
         run: |
