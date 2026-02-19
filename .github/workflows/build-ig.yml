@@ -8,9 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.18-8/x64
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -44,8 +41,8 @@ jobs:
       - name: Build IG
         run: |
           echo "Current directory: $PWD"
-          java -Xmx4g -jar tools/publisher.jar -ig ig.ini
+          java -Xmx6g -jar tools/publisher.jar -ig ig.ini
 
       - name: Fail on QA errors
         run: |
-          grep -q "ERROR" IG/PH-Immunization/output/qa.html && exit 1 || true
+          grep -q "ERROR" PH-Immunization/output/qa.html && exit 1 || true
