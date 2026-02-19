@@ -42,8 +42,7 @@ jobs:
         run: ls -l
 
       - name: Build IG
-        working-directory: ./PH-ImmunizationIG
-        run: java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini -tx https://tx.fhir.org
+        run: java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini -ig PH-ImmunizationIG/ig.ini
 
       - name: Fail on QA errors
         run: |
