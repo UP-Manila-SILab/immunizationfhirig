@@ -8,6 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.18-8/x64
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -18,8 +21,22 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Build Immunization IG
-        run:  java -jar PH-ImmunizationIG/publisher.jar -ig PH-ImmunizationIG/ig.ini
+      - name: Download IG Publisher
+        run: |
+          mkdir -p tools
+          curl -L -o tools/publisher.jar https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
+          ls -l tools
+
+      - name: Cache FHIR packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.fhir
+          key: fhir-cache-${{ runner.os }}-${{ hashFiles('IG/PH-Immunization/ig.ini') }}
+
+      - name: Build IG
+        run: |
+          java -Xmx4g -jar tools/publisher.jar -ig PH-ImmunizationIG/ig.ini
 
       - name: Fail on QA errors
         run: |
