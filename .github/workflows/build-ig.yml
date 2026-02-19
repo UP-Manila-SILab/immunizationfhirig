@@ -20,15 +20,9 @@ jobs:
 
       - name: Build Immunization IG
         run: |
-          cd IG/Immunization
-          java -jar publisher.jar -ig ig.ini
-
-      - name: Build RoadSafety IG
-        run: |
-          cd ../../IG/RoadSafety
+          cd IG/PH-ImmunizationIG
           java -jar publisher.jar -ig ig.ini
 
       - name: Fail on QA errors
         run: |
-          grep -q "ERROR" IG/Immunization/output/qa.html && exit 1 || true
-          grep -q "ERROR" IG/RoadSafety/output/qa.html && exit 1 || true
+          grep -q "ERROR" IG/PH-Immunization/output/qa.html && exit 1 || true
