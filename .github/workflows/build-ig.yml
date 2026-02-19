@@ -35,9 +35,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fhir-packages-
 
-      - name: List IG folder
-        run: ls -l PH-ImmunizationIG
-
       - name: Build IG
         working-directory: ./IG/PH-ImmunizationIG
         run: java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini
