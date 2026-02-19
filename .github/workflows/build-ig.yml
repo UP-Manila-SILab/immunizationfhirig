@@ -18,6 +18,18 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install FHIR Validator
+        run: |
+          npm install -g fsh-sushi
+
+      - name: Verify SUSHI installation
+        run: sushi --version
+
       - name: Download IG Publisher
         run: |
           mkdir -p tools
@@ -45,4 +57,8 @@ jobs:
 
       - name: Fail on QA errors
         run: |
-          grep -q "ERROR" PH-Immunization/output/qa.html && exit 1 || true
+          if [ -f PH-Immunization/output/qa.html ]; then
+            grep -q "ERROR" PH-Immunization/output/qa.html && echo "QA errors found!" && exit 1 || echo "No QA errors."
+          else
+            echo "QA file not found, skipping QA check."
+          fi
