@@ -44,7 +44,7 @@ jobs:
       - name: Build IG
         run: |
           echo "Current directory: $PWD"
-          java -Xmx4g -jar tools/publisher.jar -ig PH-ImmunizationIG/ig.ini
+          java -Xmx4g -jar tools/publisher.jar -ig ig.ini
 
       - name: Fail on QA errors
         run: |
