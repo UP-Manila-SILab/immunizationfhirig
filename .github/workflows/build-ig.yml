@@ -34,6 +34,12 @@ jobs:
           key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini') }}
           restore-keys: |
             ${{ runner.os }}-fhir-packages-
+      
+      - name: Show current directory
+        run: pwd
+
+      - name: List IG folder
+        run: ls -l
 
       - name: Build IG
         working-directory: ./PH-ImmunizationIG
