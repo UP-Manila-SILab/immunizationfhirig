@@ -36,10 +36,10 @@ jobs:
           curl -L -o tools/publisher.jar https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
           ls -l tools
 
-      - name: Install FHIR packages
+      - name: Install Local FHIR Package
         run: |
-          mkdir -p ~/.fhir/packages
-          curl -L -o ~/.fhir/packages/fhir.ph.core-1.0.0.tgz https://packages.fhir.org/ig/fhir.ph.core/1.0.0.tgz
+          mkdir -p ~/.fhir/packages/fhir.ph.core/1.0.0
+          cp tools/package/fhir.ph.core-1.0.0.tgz ~/.fhir/packages/fhir.ph.core/1.0.0/package.tgz
 
       - name: Cache FHIR packages
         uses: actions/cache@v3
