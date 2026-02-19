@@ -30,13 +30,17 @@ jobs:
       - name: Cache FHIR packages
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.fhir
-          key: fhir-cache-${{ runner.os }}-${{ hashFiles('IG/PH-Immunization/ig.ini') }}
+          path: ~/.fhir/packages
+          key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-fhir-packages-
+
+      - name: List IG folder
+        run: ls -l PH-ImmunizationIG
 
       - name: Build IG
-        run: |
-          java -Xmx4g -jar tools/publisher.jar -ig PH-ImmunizationIG/ig.ini
+        working-directory: ./PH-ImmunizationIG
+        run: java -Xmx4g -jar ../tools/publisher.jar -ig ig.ini
 
       - name: Fail on QA errors
         run: |
