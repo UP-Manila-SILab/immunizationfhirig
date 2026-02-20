@@ -41,6 +41,8 @@ jobs:
         with:
           path: ~/.fhir/packages
           key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini') }}
+          restore-keys: |
+           ${{ runner.os }}-fhir-packages-
 
       - name: Run Sushi
         run: sushi .
