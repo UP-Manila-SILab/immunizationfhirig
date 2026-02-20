@@ -30,32 +30,37 @@ jobs:
       - name: Verify SUSHI installation
         run: sushi --version
 
-      - name: Download IG Publisher
-        run: |
-          mkdir -p tools
-          curl -L -o tools/publisher.jar https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
-          ls -l tools
-
       - name: Install Local FHIR Package
         run: |
           mkdir -p ~/.fhir/packages/fhir.ph.core/1.0.0
-          cp tools/package/fhir.ph.core/1.0.0/fhir.ph.core-1.0.0.tgz ~/.fhir/packages/fhir.ph.core/1.0.0/fhir.ph.core-1.0.0.tgz
+          cp tools/package/fhir.ph.core/1.0.0/fhir.ph.core-1.0.0.tgz \
+           ~/.fhir/packages/fhir.ph.core/1.0.0/
 
       - name: Cache FHIR packages
         uses: actions/cache@v3
         with:
           path: ~/.fhir/packages
           key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini') }}
-          restore-keys: |
-            ${{ runner.os }}-fhir-packages-
+
+      - name: Run Sushi
+        run: sushi .
+          
+      - name: Download IG Publisher
+        run: |
+          mkdir -p tools
+          curl -L -o tools/publisher.jar \
+          https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
+          
       
       - name: Show current directory
         run: pwd
 
       - name: List IG folder 
         run: ls -l
+
       - name: Verify package in cache
         run: ls -l ~/.fhir/packages/fhir.ph.core/1.0.0
+
       - name: Build IG
         run: |
           echo "Current directory: $PWD"
