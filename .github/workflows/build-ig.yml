@@ -51,7 +51,6 @@ jobs:
           curl -L -o tools/publisher.jar \
           https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
           
-      
       - name: Show current directory
         run: pwd
 
