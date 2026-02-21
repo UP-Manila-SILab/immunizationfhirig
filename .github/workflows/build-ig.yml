@@ -14,7 +14,7 @@ jobs:
       # 2️⃣ Build Docker image locally
       - name: Build IG Docker image
         run: docker build -t fhir-sushi:latest docker/
-
+ 
       # 3️⃣ Run IG build inside container
       - name: Run IG build in Docker container
         run: |
