@@ -47,8 +47,8 @@ jobs:
       - name: Install Local FHIR Package
         run: |
           mkdir -p ~/.fhir/packages/fhir.ph.core#1.0.0
-          cp tools/package/fhir.ph.core#1.0.0/package.tgz \
-            ~/.fhir/packages/fhir.ph.core#1.0.0/package.tgz
+          cp tools/package/fhir.ph.core#1.0.0/package/* \
+            ~/.fhir/packages/fhir.ph.core#1.0.0/package/
 
       - name: Show FHIR cache
         run: ls -R ~/.fhir/packages
