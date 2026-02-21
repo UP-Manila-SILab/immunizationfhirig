@@ -1,0 +1,370 @@
+{
+  "index-version" : 2,
+  "files" : [{
+    "filename" : "ImplementationGuide-fhir.ph.core.json",
+    "resourceType" : "ImplementationGuide",
+    "id" : "fhir.ph.core",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ImplementationGuide/fhir.ph.core",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "CodeSystem-PSCED.json",
+    "resourceType" : "CodeSystem",
+    "id" : "PSCED",
+    "url" : "http://doh.gov.ph/fhir/ph-core/CodeSystem/PSCED",
+    "version" : "0.1.0",
+    "content" : "not-present"
+  },
+  {
+    "filename" : "CodeSystem-PSGC.json",
+    "resourceType" : "CodeSystem",
+    "id" : "PSGC",
+    "url" : "http://doh.gov.ph/fhir/ph-core/CodeSystem/PSGC",
+    "version" : "0.1.0",
+    "content" : "complete"
+  },
+  {
+    "filename" : "CodeSystem-PSOC.json",
+    "resourceType" : "CodeSystem",
+    "id" : "PSOC",
+    "url" : "http://doh.gov.ph/fhir/ph-core/CodeSystem/PSOC",
+    "version" : "0.1.0",
+    "content" : "not-present"
+  },
+  {
+    "filename" : "CodeSystem-drugs.json",
+    "resourceType" : "CodeSystem",
+    "id" : "drugs",
+    "url" : "http://doh.gov.ph/fhir/ph-core/CodeSystem/drugs",
+    "version" : "0.1.0",
+    "content" : "not-present"
+  },
+  {
+    "filename" : "CodeSystem-indigenous-groups.json",
+    "resourceType" : "CodeSystem",
+    "id" : "indigenous-groups",
+    "url" : "http://doh.gov.ph/fhir/ph-core/CodeSystem/indigenous-groups",
+    "version" : "0.1.0",
+    "content" : "complete"
+  },
+  {
+    "filename" : "NamingSystem-doh-nhfr-code-ns.json",
+    "resourceType" : "NamingSystem",
+    "id" : "doh-nhfr-code-ns",
+    "kind" : "identifier"
+  },
+  {
+    "filename" : "NamingSystem-pdd-registration-ns.json",
+    "resourceType" : "NamingSystem",
+    "id" : "pdd-registration-ns",
+    "kind" : "identifier"
+  },
+  {
+    "filename" : "NamingSystem-philhealth-id-ns.json",
+    "resourceType" : "NamingSystem",
+    "id" : "philhealth-id-ns",
+    "kind" : "identifier"
+  },
+  {
+    "filename" : "NamingSystem-philsys-id-ns.json",
+    "resourceType" : "NamingSystem",
+    "id" : "philsys-id-ns",
+    "kind" : "identifier"
+  },
+  {
+    "filename" : "StructureDefinition-barangay.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "barangay",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/barangay",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-city-municipality.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "city-municipality",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/city-municipality",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-educational-attainment.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "educational-attainment",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/educational-attainment",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-indigenous-group.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "indigenous-group",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/indigenous-group",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-indigenous-people.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "indigenous-people",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/indigenous-people",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-occupation.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "occupation",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/occupation",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-address.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-address",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-address",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Address",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-doh-nhfr-code.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-doh-nhfr-code",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-doh-nhfr-code",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Identifier",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-encounter.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-encounter",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-encounter",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Encounter",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-immunization.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-immunization",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-immunization",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Immunization",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-location.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-location",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-location",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Location",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-medication.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-medication",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-medication",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Medication",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-observation.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-observation",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-observation",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Observation",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-organization.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-organization",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-organization",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Organization",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-patient.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-patient",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-patient",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Patient",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-pdd-registration.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-pdd-registration",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-pdd-registration",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Identifier",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-philhealth-id.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-philhealth-id",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-philhealth-id",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Identifier",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-philsys-id.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-philsys-id",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-philsys-id",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Identifier",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-practitioner.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-practitioner",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-practitioner",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Practitioner",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-procedure.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-procedure",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-procedure",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "Procedure",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-ph-core-relatedperson.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "ph-core-relatedperson",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/ph-core-relatedperson",
+    "version" : "0.1.0",
+    "kind" : "resource",
+    "type" : "RelatedPerson",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-province.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "province",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/province",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-race.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "race",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/race",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "StructureDefinition-region.json",
+    "resourceType" : "StructureDefinition",
+    "id" : "region",
+    "url" : "http://doh.gov.ph/fhir/ph-core/StructureDefinition/region",
+    "version" : "0.1.0",
+    "kind" : "complex-type",
+    "type" : "Extension",
+    "derivation" : "constraint"
+  },
+  {
+    "filename" : "ValueSet-barangays.json",
+    "resourceType" : "ValueSet",
+    "id" : "barangays",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/barangays",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-cities.json",
+    "resourceType" : "ValueSet",
+    "id" : "cities",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/cities",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-drugs.json",
+    "resourceType" : "ValueSet",
+    "id" : "drugs",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/drugs",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-educational-attainments.json",
+    "resourceType" : "ValueSet",
+    "id" : "educational-attainments",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/educational-attainments",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-indigenous-groups.json",
+    "resourceType" : "ValueSet",
+    "id" : "indigenous-groups",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/indigenous-groups",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-occupational-classifications.json",
+    "resourceType" : "ValueSet",
+    "id" : "occupational-classifications",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/occupational-classifications",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-provinces.json",
+    "resourceType" : "ValueSet",
+    "id" : "provinces",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/provinces",
+    "version" : "0.1.0"
+  },
+  {
+    "filename" : "ValueSet-regions.json",
+    "resourceType" : "ValueSet",
+    "id" : "regions",
+    "url" : "http://doh.gov.ph/fhir/ph-core/ValueSet/regions",
+    "version" : "0.1.0"
+  }]
+}
