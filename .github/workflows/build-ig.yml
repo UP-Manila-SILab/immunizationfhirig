@@ -54,6 +54,17 @@ jobs:
 
       - name: Run Sushi
         run: sushi .
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2 # recent stable
+
+      - name: Install Jekyll
+        run: gem install jekyll bundler
+
+      - name: Verify Jekyll
+        run: jekyll --version
           
       - name: Download IG Publisher
         run: |
