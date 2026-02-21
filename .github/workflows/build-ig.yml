@@ -45,3 +45,9 @@ jobs:
                 echo 'QA file not found, skipping QA check.'
               fi
             "
+      - name: Test SUSHI in container
+        run: |
+          docker run --rm -v $PWD:/workspace fhir-sushi:latest bash -c "
+            echo 'Running SUSHI on repo...';
+            sushi /workspace
+          "
