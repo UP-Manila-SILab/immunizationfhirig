@@ -17,6 +17,11 @@ RUN apt-get update && apt-get install -y \
     && gem install jekyll bundler \
     && npm install -g fsh-sushi \
     && rm -rf /var/lib/apt/lists/*
+    
+# Install Node.js 18 via NodeSource (official)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g fsh-sushi
 
 # Set Java environment
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
