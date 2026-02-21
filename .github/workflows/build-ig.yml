@@ -1,4 +1,4 @@
-name: Build FHIR IG (TEST)
+name: Build FHIR IG 
 
 on:
   push:
@@ -7,51 +7,41 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: fhir/sushi:latest  # Node, Java, SUSHI, Ruby, Jekyll pre-installed
-
     steps:
       # 1️⃣ Checkout repo
       - uses: actions/checkout@v4
 
-      # 2️⃣ Cache PH Core packages
-      - name: Cache PH Core
-        uses: actions/cache@v3
-        with:
-          path: ~/.fhir/packages/fhir.ph.core#1.0.0
-          key: ${{ runner.os }}-ph-core-1.0.0
+      # 2️⃣ Build Docker image locally
+      - name: Build IG Docker image
+        run: docker build -t fhir-sushi:latest docker/
 
-      - name: Copy PH Core to FHIR cache (if not cached)
+      # 3️⃣ Run IG build inside container
+      - name: Run IG build in Docker container
         run: |
-          if [ ! -d "~/.fhir/packages/fhir.ph.core#1.0.0/package" ]; then
-            mkdir -p "~/.fhir/packages/fhir.ph.core#1.0.0/package"
-            cp -r tools/package/fhir.ph.core-1.0.0/package/* ~/.fhir/packages/fhir.ph.core#1.0.0/package/
-          fi
+          docker run --rm \
+            -v $PWD:/workspace \
+            -v $HOME/.fhir/packages:/root/.fhir/packages \
+            fhir-sushi:latest bash -c "
+              # Copy PH Core if not already cached
+              mkdir -p /root/.fhir/packages/fhir.ph.core#1.0.0/package
+              cp -r /workspace/tools/package/fhir.ph.core-1.0.0/package/* \
+                     /root/.fhir/packages/fhir.ph.core#1.0.0/package/ || true
+              
+              # Download IG Publisher if not exists
+              mkdir -p /workspace/tools
+              if [ ! -f /workspace/tools/publisher.jar ]; then
+                curl -L -o /workspace/tools/publisher.jar \
+                  https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
+              fi
 
-      # 3️⃣ Cache IG Publisher
-      - name: Cache IG Publisher
-        uses: actions/cache@v3
-        with:
-          path: tools/publisher.jar
-          key: ${{ runner.os }}-ig-publisher-latest
+              # Run SUSHI and build IG
+              sushi /workspace
+              java -Xmx6g -jar /workspace/tools/publisher.jar -ig /workspace/ig.ini
 
-      - name: Download IG Publisher if not cached
-        run: |
-          if [ ! -f tools/publisher.jar ]; then
-            mkdir -p tools
-            curl -L -o tools/publisher.jar \
-            https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
-          fi
-
-      # 4️⃣ Build IG
-      - name: Build IG
-        run: |
-          sushi .
-          java -Xmx6g -jar tools/publisher.jar -ig ig.ini
-
-          # Optional QA check
-          if [ -f output/qa.html ]; then
-            grep -q "ERROR" output/qa.html && echo "QA errors found!" && exit 1 || echo "No QA errors."
-          else
-            echo "QA file not found, skipping QA check."
-          fi
+              # QA check
+              if [ -f /workspace/output/qa.html ]; then
+                grep -q 'ERROR' /workspace/output/qa.html && echo 'QA errors found!' && exit 1 || echo 'No QA errors.'
+              else
+                echo 'QA file not found, skipping QA check.'
+              fi
+            "
