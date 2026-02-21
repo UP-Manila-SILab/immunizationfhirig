@@ -23,6 +23,20 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Prepare FHIR cache
+        run: mkdir -p ~/.fhir/packages
+
+      - name: Cache FHIR packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.fhir/packages
+          key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini', '**/sushi-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-fhir-packages-
+          
+      - name: Verify TGZ exists in repo
+        run: ls -R tools/package || echo "No tools/package folder"
+
       - name: Install FHIR Validator
         run: |
           npm install -g fsh-sushi
@@ -32,17 +46,12 @@ jobs:
 
       - name: Install Local FHIR Package
         run: |
-          mkdir -p ~/.fhir/packages/fhir.ph.core/1.0.0
+          mkdir -p ~/.fhir/packages/fhir.ph.core#1.0.0
           cp tools/package/fhir.ph.core/1.0.0/fhir.ph.core-1.0.0.tgz \
-            ~/.fhir/packages/fhir.ph.core/1.0.0/
+            ~/.fhir/packages/fhir.ph.core#1.0.0/package.tgz
 
-      - name: Cache FHIR packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.fhir/packages
-          key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini') }}
-          restore-keys: |
-           ${{ runner.os }}-fhir-packages-
+      - name: Show FHIR cache
+        run: ls -R ~/.fhir/packages
 
       - name: Run Sushi
         run: sushi .
@@ -55,12 +64,6 @@ jobs:
           
       - name: Show current directory
         run: pwd
-
-      - name: List IG folder 
-        run: ls -l
-
-      - name: Verify package in cache
-        run: ls -l ~/.fhir/packages/fhir.ph.core/1.0.0
 
       - name: Build IG
         run: |
