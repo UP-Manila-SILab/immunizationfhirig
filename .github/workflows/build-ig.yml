@@ -7,83 +7,51 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: fhir/sushi:latest  # Node, Java, SUSHI, Ruby, Jekyll pre-installed
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      # 1️⃣ Checkout repo
+      - uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Prepare FHIR cache
-        run: mkdir -p ~/.fhir/packages
-
-      - name: Cache FHIR packages
+      # 2️⃣ Cache PH Core packages
+      - name: Cache PH Core
         uses: actions/cache@v3
         with:
-          path: ~/.fhir/packages
-          key: ${{ runner.os }}-fhir-packages-${{ hashFiles('**/ig.ini', '**/sushi-config.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-fhir-packages-
-          
-      - name: Verify TGZ exists in repo
-        run: ls -R tools/package || echo "No tools/package folder"
+          path: ~/.fhir/packages/fhir.ph.core#1.0.0
+          key: ${{ runner.os }}-ph-core-1.0.0
 
-      - name: Install FHIR Validator
+      - name: Copy PH Core to FHIR cache (if not cached)
         run: |
-          npm install -g fsh-sushi
+          if [ ! -d "~/.fhir/packages/fhir.ph.core#1.0.0/package" ]; then
+            mkdir -p "~/.fhir/packages/fhir.ph.core#1.0.0/package"
+            cp -r tools/package/fhir.ph.core-1.0.0/package/* ~/.fhir/packages/fhir.ph.core#1.0.0/package/
+          fi
 
-      - name: Verify SUSHI installation
-        run: sushi --version
-
-      - name: Install Local FHIR Package
-        run: |
-          mkdir -p ~/.fhir/packages/fhir.ph.core#1.0.0/package
-          cp -r tools/package/fhir.ph.core#1.0.0/package/* ~/.fhir/packages/fhir.ph.core#1.0.0/package/
-
-      - name: Show FHIR cache
-        run: ls -R ~/.fhir/packages
-
-      - name: Run Sushi
-        run: sushi .
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      # 3️⃣ Cache IG Publisher
+      - name: Cache IG Publisher
+        uses: actions/cache@v3
         with:
-          ruby-version: 3.2 # recent stable
+          path: tools/publisher.jar
+          key: ${{ runner.os }}-ig-publisher-latest
 
-      - name: Install Jekyll
-        run: gem install jekyll bundler
-
-      - name: Verify Jekyll
-        run: jekyll --version
-          
-      - name: Download IG Publisher
+      - name: Download IG Publisher if not cached
         run: |
-          mkdir -p tools
-          curl -L -o tools/publisher.jar \
-          https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
-          
-      - name: Show current directory
-        run: pwd
+          if [ ! -f tools/publisher.jar ]; then
+            mkdir -p tools
+            curl -L -o tools/publisher.jar \
+            https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
+          fi
 
+      # 4️⃣ Build IG
       - name: Build IG
         run: |
-          echo "Current directory: $PWD"
+          sushi .
           java -Xmx6g -jar tools/publisher.jar -ig ig.ini
 
-      - name: Fail on QA errors
-        run: |
-          if [ -f PH-Immunization/output/qa.html ]; then
-            grep -q "ERROR" PH-Immunization/output/qa.html && echo "QA errors found!" && exit 1 || echo "No QA errors."
+          # Optional QA check
+          if [ -f output/qa.html ]; then
+            grep -q "ERROR" output/qa.html && echo "QA errors found!" && exit 1 || echo "No QA errors."
           else
             echo "QA file not found, skipping QA check."
           fi
