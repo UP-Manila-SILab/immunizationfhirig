@@ -1,53 +1,69 @@
-name: Build FHIR IG 
+name: Build and Publish FHIR IG
 
 on:
   push:
     branches: [main]
 
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # 1️⃣ Checkout repo
-      - uses: actions/checkout@v4
+      # 📥 Checkout repository
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      # 2️⃣ Build Docker image locally
-      - name: Build IG Docker image
-        run: docker build -t fhir-sushi:latest docker/
- 
-      # 3️⃣ Run IG build inside container
-      - name: Run IG build in Docker container
+      # ☕ Setup Java (required for IG Publisher)
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # 🟢 Setup Node.js (required for SUSHI)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # 📦 Install SUSHI
+      - name: Install SUSHI
+        run: npm install -g fsh-sushi
+
+      # 🧠 Cache IG Publisher + packages
+      - name: Cache publisher
+        uses: actions/cache@v4
+        with:
+          path: |
+            input-cache
+            ~/.fhir/packages
+          key: ${{ runner.os }}-fhir-${{ hashFiles('**/sushi-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-fhir-
+
+      # ⬇️ Download IG Publisher (if not cached)
+      - name: Download IG Publisher
         run: |
-          docker run --rm \
-            -v $PWD:/workspace \
-            -v $HOME/.fhir/packages:/root/.fhir/packages \
-            fhir-sushi:latest bash -c "
-              # Copy PH Core if not already cached
-              mkdir -p /root/.fhir/packages/fhir.ph.core#1.0.0/package
-              cp -r /workspace/tools/package/fhir.ph.core-1.0.0/package/* \
-                     /root/.fhir/packages/fhir.ph.core#1.0.0/package/ || true
-              
-              # Download IG Publisher if not exists
-              mkdir -p /workspace/tools
-              if [ ! -f /workspace/tools/publisher.jar ]; then
-                curl -L -o /workspace/tools/publisher.jar \
-                  https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar
-              fi
+          mkdir -p input-cache
+          if [ ! -f input-cache/publisher.jar ]; then
+            curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
+          fi
 
-              # Run SUSHI and build IG
-              sushi /workspace
-              java -Xmx6g -jar /workspace/tools/publisher.jar -ig /workspace/ig.ini
+      # 🧪 Run SUSHI (FSH → FHIR JSON)
+      - name: Run SUSHI
+        run: sushi .
 
-              # QA check
-              if [ -f /workspace/output/qa.html ]; then
-                grep -q 'ERROR' /workspace/output/qa.html && echo 'QA errors found!' && exit 1 || echo 'No QA errors.'
-              else
-                echo 'QA file not found, skipping QA check.'
-              fi
-            "
-      - name: Test SUSHI in container
+      # 🏗️ Run IG Publisher
+      - name: Build IG
+        run: java -jar input-cache/publisher.jar publisher -ig .
+
+      # ❌ Fail build if QA errors exist (optional but recommended)
+      - name: Check QA report
         run: |
-          docker run --rm -v $PWD:/workspace fhir-sushi:latest bash -c "
-            echo 'Running SUSHI on repo...';
-            sushi /workspace
-          "
+          if grep -q "ERROR" output/qa.html; then
+            echo "❌ IG Publisher QA errors found"
+            exit 1
+          fi
