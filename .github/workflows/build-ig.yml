@@ -72,6 +72,7 @@ jobs:
       #  Run IG Publisher
       - name: Build IG
         run: java -jar input-cache/publisher.jar publisher -ig .
+        
              if [ ! -d output ]; then
               echo "IG Publisher did not create output/"
               exit 1
