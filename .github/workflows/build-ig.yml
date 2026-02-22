@@ -89,10 +89,7 @@ jobs:
             echo " IG Publisher QA errors found"
             exit 1
           fi
-          if grep -q "ERROR" output/qa.html; then
-            echo " IG Publisher QA errors found"
-            exit 1
-          fi
+
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.8
