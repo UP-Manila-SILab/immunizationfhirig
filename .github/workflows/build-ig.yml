@@ -78,6 +78,21 @@ jobs:
               echo "IG Publisher did not create output/"
               exit 1
              fi
+      #  Debug: List contents of output folder
+      - name: List IG Publisher Output
+        run: |
+          echo "Listing files in output folder:"
+          ls -la output || echo "Output folder does not exist"
+          echo "All files recursively:"
+          find output -type f || echo "No files found"
+
+      # Fail if output folder is empty
+      - name: Fail if output is empty
+        run: |
+          if [ ! -d output ] || [ -z "$(ls -A output)" ]; then
+            echo "IG Publisher did not generate output files."
+            exit 1
+          fi
 
       - name: Fix Permissions
         run: |
