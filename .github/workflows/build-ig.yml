@@ -120,8 +120,6 @@ jobs:
           username: ${{ secrets.ADMIN_USER }}
           key: ${{ secrets.ADMIN_KEY }}
           port: ${{ secrets.ADMIN_PORT }}
-          source: "./output/"
-          target: "/var/www/html/Dev/Immunization"
-          recursive: true
-          rm: false
+          script: |
+            rsync -avz --delete ./output/ /var/www/html/Dev/Immunization/
 
