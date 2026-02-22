@@ -11,29 +11,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 📥 Checkout repository
+      #  Checkout repository
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # ☕ Setup Java (required for IG Publisher)
+      #  Setup Java (required for IG Publisher)
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # 🟢 Setup Node.js (required for SUSHI)
+      #  Setup Node.js (required for SUSHI)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
 
-      # 📦 Install SUSHI
+
+      #  Install SUSHI
       - name: Install SUSHI
         run: npm install -g fsh-sushi
 
-      # 🧠 Cache IG Publisher + packages
+      #  Cache IG Publisher + packages
       - name: Cache publisher
         uses: actions/cache@v4
         with:
@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fhir-
 
-      # ⬇️ Download IG Publisher (if not cached)
+      #  Download IG Publisher (if not cached)
       - name: Download IG Publisher
         run: |
           mkdir -p input-cache
@@ -52,11 +52,11 @@ jobs:
             curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
           fi
 
-      # 🧪 Run SUSHI (FSH → FHIR JSON)
+      #  Run SUSHI (FSH → FHIR JSON)
       - name: Run SUSHI
         run: sushi .
 
-      # 🏗️ Run IG Publisher
+      #  Run IG Publisher
       - name: Build IG
         run: java -jar input-cache/publisher.jar publisher -ig .
 
