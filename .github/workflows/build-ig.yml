@@ -78,13 +78,6 @@ jobs:
               echo "IG Publisher did not create output/"
               exit 1
              fi
-      #  Debug: List contents of output folder
-      - name: List IG Publisher Output
-        run: |
-          echo "Listing files in output folder:"
-          ls -la output || echo "Output folder does not exist"
-          echo "All files recursively:"
-          find output -type f || echo "No files found"
 
       # Fail if output folder is empty
       - name: Fail if output is empty
@@ -132,16 +125,3 @@ jobs:
           recursive: true
           rm: false
 
-      # ----------------------------
-      # Fix permissions & ownership on server
-      # ----------------------------
-      - name: Fix permissions on server
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.ADMIN_HOST }}
-          username: ${{ secrets.ADMIN_USER }}
-          key: ${{ secrets.ADMIN_KEY }}
-          port: ${{ secrets.ADMIN_PORT }}
-          script: |
-            chmod -R 755 /var/www/html/Dev/Immunization
-            chown -R ubuntu:www-data /var/www/html/Dev/Immunization
