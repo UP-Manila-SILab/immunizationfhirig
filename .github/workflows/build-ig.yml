@@ -28,6 +28,15 @@ jobs:
         with:
           node-version: 18
 
+      # Setup Ruby 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      # Install Jekyll
+      - name: Install Jekyll
+        run: gem install jekyll bundler
       #  Install SUSHI
       - name: Install SUSHI
         run: npm install -g fsh-sushi
