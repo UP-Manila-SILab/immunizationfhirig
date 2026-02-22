@@ -28,7 +28,6 @@ jobs:
         with:
           node-version: 18
 
-
       #  Install SUSHI
       - name: Install SUSHI
         run: npm install -g fsh-sushi
