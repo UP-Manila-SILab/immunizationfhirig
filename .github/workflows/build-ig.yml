@@ -144,4 +144,4 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           script: |
             chmod -R 755 /var/www/html/Dev/Immunization
-            chown -R www-data:www-data /var/www/html/Dev/Immunization
+            chown -R ubuntu:www-data /var/www/html/Dev/Immunization
