@@ -107,13 +107,55 @@ jobs:
             exit 1
           fi
 
+      # ----------------------------
+      # Debug IG output locally
+      # ----------------------------
+      - name: Debug IG output
+        run: |
+          echo "Top-level files in output:"
+          ls -la output
+          echo "Recursive listing of all files:"
+          find output -type f
 
-      - name: Deploy via SSH
+      # ----------------------------
+      # Ensure target folder exists on server
+      # ----------------------------
+      - name: Ensure target folder exists
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.ADMIN_HOST }}
           username: ${{ secrets.ADMIN_USER }}
           key: ${{ secrets.ADMIN_KEY }}
-          port: ${{ secrets.ADMIN_PORT }}      
+          port: ${{ secrets.ADMIN_PORT }}
+          script: |
+            mkdir -p /var/www/html/Dev/Immunization
+            chmod 755 /var/www/html/Dev/Immunization
+
+      # ----------------------------
+      # Deploy IG recursively via SSH
+      # ----------------------------
+      - name: Deploy FHIR IG to server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
           source: "./output/"
-          target: "/var/www/html/Dev/Immunization"  # where you want the files on your server
+          target: "/var/www/html/Dev/Immunization"
+          recursive: true
+          rm: false
+
+      # ----------------------------
+      # Fix permissions & ownership on server
+      # ----------------------------
+      - name: Fix permissions on server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          script: |
+            chmod -R 755 /var/www/html/Dev/Immunization
+            chown -R www-data:www-data /var/www/html/Dev/Immunization
