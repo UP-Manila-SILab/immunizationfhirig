@@ -73,10 +73,20 @@ jobs:
       - name: Build IG
         run: java -jar input-cache/publisher.jar publisher -ig .
 
-      # ❌ Fail build if QA errors exist (optional but recommended)
+      # Fail build if QA errors exist 
       - name: Check QA report
         run: |
           if grep -q "ERROR" output/qa.html; then
-            echo "❌ IG Publisher QA errors found"
+            echo " IG Publisher QA errors found"
             exit 1
           fi
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}      
+          source: "./output/"
+          target: "/var/www/html/Dev/Immunization"  # where you want the files on your server
