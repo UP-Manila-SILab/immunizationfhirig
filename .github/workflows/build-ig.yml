@@ -51,6 +51,11 @@ jobs:
             curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
           fi
 
+      - name: Install local PH Core package
+        run: |
+          mkdir -p ~/.fhir/packages
+          cp tools/package/*.tgz ~/.fhir/packages/
+
       #  Run SUSHI (FSH → FHIR JSON)
       - name: Run SUSHI
         run: sushi .
