@@ -118,20 +118,6 @@ jobs:
           find output -type f
 
       # ----------------------------
-      # Ensure target folder exists on server
-      # ----------------------------
-      - name: Ensure target folder exists
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.ADMIN_HOST }}
-          username: ${{ secrets.ADMIN_USER }}
-          key: ${{ secrets.ADMIN_KEY }}
-          port: ${{ secrets.ADMIN_PORT }}
-          script: |
-            mkdir -p /var/www/html/Dev/Immunization
-            chmod 755 /var/www/html/Dev/Immunization
-
-      # ----------------------------
       # Deploy IG recursively via SSH
       # ----------------------------
       - name: Deploy FHIR IG to server
