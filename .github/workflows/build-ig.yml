@@ -86,6 +86,10 @@ jobs:
             echo "IG Publisher did not generate output files."
             exit 1
           fi
+      - name: Add VERSION files
+        run: |
+          echo "${GITHUB_SHA}" > output/VERSION.txt
+          echo "<html><body>Current IG version: ${GITHUB_SHA}</body></html>" > output/version.html
 
       - name: Fix Permissions
         run: |
@@ -107,20 +111,6 @@ jobs:
           ls -la output
           echo "Recursive listing of all files:"
           find output -type f
-
-      - name: Set commit SHA
-        run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
-
-      # Create versioned directory on server
-      - name: Create remote versioned folder
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.ADMIN_HOST }}
-          username: ${{ secrets.ADMIN_USER }}
-          key: ${{ secrets.ADMIN_KEY }}
-          port: ${{ secrets.ADMIN_PORT }}
-          script: |
-            mkdir -p /var/www/html/Dev/Immunization/${COMMIT_SHA}
 
       - name: Set commit SHA
         run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
@@ -147,8 +137,9 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           script: |
             SHA=${{ github.sha }}
-            TARGET_DIR=/var/www/html/Dev/Immunization/$SHA
-            CURRENT_LINK=/var/www/html/Dev/Immunization/current
+            IMMUN_DIR=/var/www/html/Dev/Immunization
+            TARGET_DIR=$IMMUN_DIR/$SHA
+            CURRENT_LINK=$IMMUN_DIR/current
 
             if [ ! -d "$TARGET_DIR" ]; then
               echo "ERROR: Versioned folder does not exist: $TARGET_DIR"
@@ -170,6 +161,11 @@ jobs:
             # Update current symlink
             rm -f "$CURRENT_LINK"
             ln -s "$TARGET_DIR" "$CURRENT_LINK"
+
+            # Write VERSION files in Dev/Immunization
+            echo "$SHA" > $IMMUN_DIR/VERSION.txt
+            echo "<html><body>Current IG version: $SHA</body></html>" > $IMMUN_DIR/version.html
+            chown www-data:www-data $IMMUN_DIR/VERSION.txt $IMMUN_DIR/version.html
 
             echo "Deployment complete. current/ points to $TARGET_DIR"
 
