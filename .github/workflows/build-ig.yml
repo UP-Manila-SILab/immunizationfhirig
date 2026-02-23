@@ -147,8 +147,16 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           env: COMMIT_SHA
           script: |
+            echo "Commit SHA: $COMMIT_SHA"
+
+            if [ ! -d /var/www/html/Dev/Immunization/$COMMIT_SHA ]; then
+              echo "ERROR: Version folder does not exist"
+              ls -la /var/www/html/Dev/Immunization
+              exit 1
+            fi
+
             rm -rf /var/www/html/Dev/Immunization/current
-            cp -r /var/www/html/Dev/Immunization/${COMMIT_SHA} /var/www/html/Dev/Immunization/current
+            cp -r /var/www/html/Dev/Immunization/$COMMIT_SHA /var/www/html/Dev/Immunization/current
 
 
           
