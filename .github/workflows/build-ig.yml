@@ -145,16 +145,17 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           script: |
             SHA=${{ github.sha }}
-            echo "Commit SHA: $SHA"
-
-            if [ ! -d /var/www/html/Dev/Immunization/$SHA ]; then
-              echo "ERROR: Version folder does not exist"
-              ls -la /var/www/html/Dev/Immunization
-              exit 1
-            fi
-
-            rm -rf /var/www/html/Dev/Immunization/current
-            # Use a symlink to avoid 403 errors
+            # Give read+execute to directories, read to files
+            find /var/www/html/Dev/Immunization/$SHA -type d -exec chmod 755 {} \;
+            find /var/www/html/Dev/Immunization/$SHA -type f -exec chmod 644 {} \;
+            # Make sure symlink can be followed
+            chmod 755 /var/www/html/Dev/Immunization
+            chmod 755 /var/www/html/Dev
+            chmod 755 /var/www/html
+            # Optional: set ownership to www-data
+            chown -R www-data:www-data /var/www/html/Dev/Immunization/$SHA
+            # Update symlink
+            rm -f /var/www/html/Dev/Immunization/current
             ln -s /var/www/html/Dev/Immunization/$SHA /var/www/html/Dev/Immunization/current
 
           
