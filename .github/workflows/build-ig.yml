@@ -138,29 +138,23 @@ jobs:
       # Deploy IG recursively via SSH
       - name: Update current IG
         uses: appleboy/ssh-action@v0.1.8
-        env:
-          COMMIT_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.ADMIN_HOST }}
           username: ${{ secrets.ADMIN_USER }}
           key: ${{ secrets.ADMIN_KEY }}
           port: ${{ secrets.ADMIN_PORT }}
-          envs: COMMIT_SHA
           script: |
-            echo "Commit SHA: $COMMIT_SHA"
+            SHA=${{ github.sha }}
+            echo "Commit SHA: $SHA"
 
-            if [ -z "$COMMIT_SHA" ]; then
-              echo "ERROR: COMMIT_SHA is empty"
-              exit 1
-            fi
-
-            if [ ! -d /var/www/html/Dev/Immunization/$COMMIT_SHA ]; then
+            if [ ! -d /var/www/html/Dev/Immunization/$SHA ]; then
               echo "ERROR: Version folder does not exist"
               ls -la /var/www/html/Dev/Immunization
               exit 1
             fi
 
             rm -rf /var/www/html/Dev/Immunization/current
-            ln -s /var/www/html/Dev/Immunization/$COMMIT_SHA /var/www/html/Dev/Immunization/current
+            # Use a symlink to avoid 403 errors
+            ln -s /var/www/html/Dev/Immunization/$SHA /var/www/html/Dev/Immunization/current
 
           
