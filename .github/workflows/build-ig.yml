@@ -136,16 +136,16 @@ jobs:
 
 
       # Deploy IG recursively via SSH
-      - name: Deploy FHIR IG to server
-        uses: appleboy/scp-action@v0.1.1
+      - name: Update current IG
+        uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.ADMIN_HOST }}
           username: ${{ secrets.ADMIN_USER }}
           key: ${{ secrets.ADMIN_KEY }}
           port: ${{ secrets.ADMIN_PORT }}
-          source: "output/"
-          target: "/var/www/html/Dev/Immunization"
-          recursive: true
+          script: |
+            rm -rf /var/www/html/Dev/Immunization/current
+            cp -r /var/www/html/Dev/Immunization/${COMMIT_SHA} /var/www/html/Dev/Immunization/currents
 
 
           
