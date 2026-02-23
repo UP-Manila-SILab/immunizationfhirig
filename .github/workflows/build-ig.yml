@@ -132,20 +132,23 @@ jobs:
           key: ${{ secrets.ADMIN_KEY }}
           port: ${{ secrets.ADMIN_PORT }}
           source: "output/*"
-          target: "/var/www/html/Dev/Immunization/${{ env.COMMIT_SHA }}"
+          target: "/var/www/html/Dev/Immunization/${{ github.sha }}"
 
 
       # Deploy IG recursively via SSH
       - name: Update current IG
         uses: appleboy/ssh-action@v0.1.8
+        env:
+          COMMIT_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.ADMIN_HOST }}
           username: ${{ secrets.ADMIN_USER }}
           key: ${{ secrets.ADMIN_KEY }}
           port: ${{ secrets.ADMIN_PORT }}
+          env: COMMIT_SHA
           script: |
             rm -rf /var/www/html/Dev/Immunization/current
-            cp -r /var/www/html/Dev/Immunization/${COMMIT_SHA} /var/www/html/Dev/Immunization/currents
+            cp -r /var/www/html/Dev/Immunization/${COMMIT_SHA} /var/www/html/Dev/Immunization/current
 
 
           
