@@ -145,27 +145,17 @@ jobs:
               echo "ERROR: Versioned folder does not exist: $TARGET_DIR"
               exit 1
             fi
-
-            # Set permissions for Nginx
+            
             find "$TARGET_DIR" -type d -exec chmod 755 {} \;
             find "$TARGET_DIR" -type f -exec chmod 644 {} \;
-
-            # Ensure parent directories are executable
-            chmod 755 /var/www/html
-            chmod 755 /var/www/html/Dev
-            chmod 755 /var/www/html/Dev/Immunization
-
-            # Change ownership to web server user
-            chown -R www-data:www-data "$TARGET_DIR"
 
             # Update current symlink
             rm -f "$CURRENT_LINK"
             ln -s "$TARGET_DIR" "$CURRENT_LINK"
 
-            # Write VERSION files in Dev/Immunization
+            # Write VERSION files in Dev/Immunization for SSH/browser
             echo "$SHA" > $IMMUN_DIR/VERSION.txt
             echo "<html><body>Current IG version: $SHA</body></html>" > $IMMUN_DIR/version.html
-            chown www-data:www-data $IMMUN_DIR/VERSION.txt $IMMUN_DIR/version.html
 
             echo "Deployment complete. current/ points to $TARGET_DIR"
 
