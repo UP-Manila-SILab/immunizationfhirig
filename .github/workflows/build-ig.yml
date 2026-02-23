@@ -122,6 +122,8 @@ jobs:
           script: |
             mkdir -p /var/www/html/Dev/Immunization/${COMMIT_SHA}
 
+      - name: Set commit SHA
+        run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
       
       # Upload IG to versioned folder
       - name: Upload versioned IG
@@ -145,17 +147,30 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           script: |
             SHA=${{ github.sha }}
-            # Give read+execute to directories, read to files
-            find /var/www/html/Dev/Immunization/$SHA -type d -exec chmod 755 {} \;
-            find /var/www/html/Dev/Immunization/$SHA -type f -exec chmod 644 {} \;
-            # Make sure symlink can be followed
-            chmod 755 /var/www/html/Dev/Immunization
-            chmod 755 /var/www/html/Dev
+            TARGET_DIR=/var/www/html/Dev/Immunization/$SHA
+            CURRENT_LINK=/var/www/html/Dev/Immunization/current
+
+            if [ ! -d "$TARGET_DIR" ]; then
+              echo "ERROR: Versioned folder does not exist: $TARGET_DIR"
+              exit 1
+            fi
+
+            # Set permissions for Nginx
+            find "$TARGET_DIR" -type d -exec chmod 755 {} \;
+            find "$TARGET_DIR" -type f -exec chmod 644 {} \;
+
+            # Ensure parent directories are executable
             chmod 755 /var/www/html
-            # Optional: set ownership to www-data
-            chown -R www-data:www-data /var/www/html/Dev/Immunization/$SHA
-            # Update symlink
-            rm -f /var/www/html/Dev/Immunization/current
-            ln -s /var/www/html/Dev/Immunization/$SHA /var/www/html/Dev/Immunization/current
+            chmod 755 /var/www/html/Dev
+            chmod 755 /var/www/html/Dev/Immunization
+
+            # Change ownership to web server user
+            chown -R www-data:www-data "$TARGET_DIR"
+
+            # Update current symlink
+            rm -f "$CURRENT_LINK"
+            ln -s "$TARGET_DIR" "$CURRENT_LINK"
+
+            echo "Deployment complete. current/ points to $TARGET_DIR"
 
           
