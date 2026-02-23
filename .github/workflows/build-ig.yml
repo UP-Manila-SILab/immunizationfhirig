@@ -145,7 +145,8 @@ jobs:
               echo "ERROR: Versioned folder does not exist: $TARGET_DIR"
               exit 1
             fi
-            
+
+            # Fix permissions inside the versioned folder (safe for non-root)
             find "$TARGET_DIR" -type d -exec chmod 755 {} \;
             find "$TARGET_DIR" -type f -exec chmod 644 {} \;
 
@@ -153,10 +154,21 @@ jobs:
             rm -f "$CURRENT_LINK"
             ln -s "$TARGET_DIR" "$CURRENT_LINK"
 
-            # Write VERSION files in Dev/Immunization for SSH/browser
+            # Write VERSION files
             echo "$SHA" > $IMMUN_DIR/VERSION.txt
             echo "<html><body>Current IG version: $SHA</body></html>" > $IMMUN_DIR/version.html
 
-            echo "Deployment complete. current/ points to $TARGET_DIR"
+            # Generate versions.html
+            echo "<html><body><h2>FHIR IG Versions</h2><ul>" > $IMMUN_DIR/versions.html
+            echo "<li><a href='current/index.html'>Current version</a></li>" >> $IMMUN_DIR/versions.html
 
+            # List all versioned folders
+            for d in $(ls -1 $IMMUN_DIR | grep -E '^[0-9a-f]{40}$'); do
+              echo "<li><a href='$d/index.html'>$d</a></li>" >> $IMMUN_DIR/versions.html
+            done
+
+            echo "</ul></body></html>" >> $IMMUN_DIR/versions.html
+
+            echo "Deployment complete. current/ points to $TARGET_DIR"
+            echo "versions.html generated with links to all deployed IG versions"
           
