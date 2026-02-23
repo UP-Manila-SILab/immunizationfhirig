@@ -100,9 +100,7 @@ jobs:
             exit 1
           fi
 
-      # ----------------------------
       # Debug IG output locally
-      # ----------------------------
       - name: Debug IG output
         run: |
           echo "Top-level files in output:"
@@ -110,9 +108,34 @@ jobs:
           echo "Recursive listing of all files:"
           find output -type f
 
-      # ----------------------------
+      - name: Set commit SHA
+        run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      # Create versioned directory on server
+      - name: Create remote versioned folder
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          script: |
+            mkdir -p /var/www/html/Dev/Immunization/${COMMIT_SHA}
+
+      
+      # Upload IG to versioned folder
+      - name: Upload versioned IG
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          source: "output/*"
+          target: "/var/www/html/Dev/Immunization/${{ env.COMMIT_SHA }}"
+
+
       # Deploy IG recursively via SSH
-      # ----------------------------
       - name: Deploy FHIR IG to server
         uses: appleboy/scp-action@v0.1.1
         with:
@@ -124,3 +147,5 @@ jobs:
           target: "/var/www/html/Dev/Immunization"
           recursive: true
 
+
+          
