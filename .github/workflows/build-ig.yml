@@ -99,7 +99,7 @@ jobs:
     name: CD - Deploy Dev
     needs: [ci]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
     environment: dev
 
     steps:
