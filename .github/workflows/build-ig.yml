@@ -174,7 +174,7 @@ jobs:
 
   deploy_staging:
     name: CD - Deploy Staging
-    needs: [ci]
+    needs: [ci, deploy_dev]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: staging
