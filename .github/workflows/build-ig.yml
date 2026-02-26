@@ -2,9 +2,9 @@ name: Build, Test, and Deploy FHIR IG
 
 on:
   pull_request:
-    branches: [main]
+    branches: [dev,main]
   push:
-    branches: [main]
+    branches: [dev,main]
   workflow_dispatch:
 
 concurrency:
@@ -89,119 +89,32 @@ jobs:
             exit 1
           fi
 
-      - name: Run tests
-        run: |
-          echo "No tests configured yet."
-          # Examples (choose one if applicable):
-          # npm ci && npm test
-          # bundle exec rspec
-          # ./gradlew test
-          # pytest -q
+      - name: Upload IG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ig-output
+          path: output
 
-      # lint/format/security checks
-      - name: Lint / format
-        run: |
-          echo "Add lint/format here if you have tooling."
-          # Examples:
-          # npm run lint
-          # npm run format:check
-          # gem install rubocop && rubocop
-
-  deploy:
-    name: CD - Deploy to Server (main only)
-    runs-on: ubuntu-latest
+  deploy_dev:
+    name: CD - Deploy Dev
     needs: [ci]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    environment: dev
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Download IG artifact
+        uses: actions/download-artifact@v4
         with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.1"
-
-      - name: Install Jekyll
-        run: gem install jekyll bundler
-
-      - name: Install SUSHI
-        run: npm install -g fsh-sushi
-
-      - name: Cache publisher + packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            input-cache
-            ~/.fhir/packages
-          key: ${{ runner.os }}-fhir-${{ hashFiles('**/sushi-config.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-fhir-
-
-      - name: Download IG Publisher
-        run: |
-          mkdir -p input-cache
-          if [ ! -f input-cache/publisher.jar ]; then
-            curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
-          fi
-
-      - name: Install Local FHIR Package
-        run: |
-          mkdir -p ~/.fhir/packages/fhir.ph.core#1.0.0/package
-          cp -r tools/package/fhir.ph.core#1.0.0/package/* ~/.fhir/packages/fhir.ph.core#1.0.0/package/
-
-      - name: Run SUSHI
-        run: sushi . --log-level debug
-
-      - name: Build IG
-        run: |
-          java -jar input-cache/publisher.jar publisher -ig .
-          if [ ! -d output ]; then
-            echo "IG Publisher did not create output/"
-            exit 1
-          fi
+          name: ig-output
+          path: output
 
       - name: Add VERSION files
         run: |
           echo "${GITHUB_SHA}" > output/VERSION.txt
           echo "<html><body>Current IG version: ${GITHUB_SHA}</body></html>" > output/version.html
 
-      - name: Fix Permissions
-        run: |
-          find output -type d -exec chmod 755 {} \;
-          find output -type f -exec chmod 644 {} \;
-
-      - name: Check QA report
-        run: |
-          if [ -f output/qa.html ] && grep -q "ERROR" output/qa.html; then
-            echo "IG Publisher QA errors found"
-            exit 1
-          fi
-
-      - name: Upload versioned IG (direct)
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.ADMIN_HOST }}
-          username: ${{ secrets.ADMIN_USER }}
-          key: ${{ secrets.ADMIN_KEY }}
-          port: ${{ secrets.ADMIN_PORT }}
-          source: "output/*"
-          target: "/var/www/html/Dev/Immunization/${{ github.sha }}"
-          overwrite: true
-          debug: true
-
-      - name: Update current + versions.html
+      - name: Ensure target dir exists (server)
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.ADMIN_HOST }}
@@ -210,22 +123,38 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           script: |
             set -e
+            mkdir -p "${{ secrets.DEPLOY_BASE }}/Dev/Immunization/${GITHUB_SHA}"
 
-            SHA="${{ github.sha }}"
-            IMMUN_DIR="/var/www/html/Dev/Immunization"
+      - name: Upload to server (Dev)
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          source: "output/*"
+          target: "${{ secrets.DEPLOY_BASE }}/Dev/Immunization/${{ github.sha }}"
+          overwrite: true
+          debug: true
+
+      - name: Update current + fix perms (Dev)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          script: |
+            set -e
+            IMMUN_DIR="${{ secrets.DEPLOY_BASE }}/Dev/Immunization"
+            SHA="${GITHUB_SHA}"
             TARGET_DIR="$IMMUN_DIR/$SHA"
-            CURRENT_LINK="$IMMUN_DIR/current"
 
-            if [ ! -d "$TARGET_DIR" ]; then
-              echo "ERROR: Versioned folder does not exist: $TARGET_DIR"
-              exit 1
-            fi
+            test -d "$TARGET_DIR" || (echo "Missing target dir: $TARGET_DIR" && exit 1)
 
-            # Update current symlink
-            rm -f "$CURRENT_LINK"
-            ln -s "$TARGET_DIR" "$CURRENT_LINK"
+            ln -sfn "$TARGET_DIR" "$IMMUN_DIR/current"
 
-            # Root VERSION files
+            # Optional root files
             echo "$SHA" > "$IMMUN_DIR/VERSION.txt"
             echo "<html><body>Current IG version: $SHA</body></html>" > "$IMMUN_DIR/version.html"
 
@@ -237,4 +166,82 @@ jobs:
             done
             echo "</ul></body></html>" >> "$IMMUN_DIR/versions.html"
 
-            echo "Deployment complete. current/ points to $TARGET_DIR"
+            # server-side permissions
+            find "$TARGET_DIR" -type d -exec chmod 755 {} \;
+            find "$TARGET_DIR" -type f -exec chmod 644 {} \;
+
+            echo "Dev deployment complete. current/ -> $TARGET_DIR"
+
+  deploy_staging:
+    name: CD - Deploy Staging
+    needs: [ci]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+      - name: Download IG artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ig-output
+          path: output
+
+      - name: Add VERSION files
+        run: |
+          echo "${GITHUB_SHA}" > output/VERSION.txt
+          echo "<html><body>Current IG version: ${GITHUB_SHA}</body></html>" > output/version.html
+
+      - name: Ensure target dir exists (server)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          script: |
+            set -e
+            mkdir -p "${{ secrets.DEPLOY_BASE }}/Staging/Immunization/${GITHUB_SHA}"
+
+      - name: Upload to server (Staging)
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          source: "output/*"
+          target: "${{ secrets.DEPLOY_BASE }}/Staging/Immunization/${{ github.sha }}"
+          overwrite: true
+          debug: true
+
+      - name: Update current + fix perms (Staging)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_KEY }}
+          port: ${{ secrets.ADMIN_PORT }}
+          script: |
+            set -e
+            IMMUN_DIR="${{ secrets.DEPLOY_BASE }}/Staging/Immunization"
+            SHA="${GITHUB_SHA}"
+            TARGET_DIR="$IMMUN_DIR/$SHA"
+
+            test -d "$TARGET_DIR" || (echo "Missing target dir: $TARGET_DIR" && exit 1)
+
+            ln -sfn "$TARGET_DIR" "$IMMUN_DIR/current"
+
+            echo "$SHA" > "$IMMUN_DIR/VERSION.txt"
+            echo "<html><body>Current IG version: $SHA</body></html>" > "$IMMUN_DIR/version.html"
+
+            echo "<html><body><h2>FHIR IG Versions</h2><ul>" > "$IMMUN_DIR/versions.html"
+            echo "<li><a href='current/index.html'>Current version</a></li>" >> "$IMMUN_DIR/versions.html"
+            for d in $(ls -1 "$IMMUN_DIR" | grep -E '^[0-9a-f]{40}$' || true); do
+              echo "<li><a href='$d/index.html'>$d</a></li>" >> "$IMMUN_DIR/versions.html"
+            done
+            echo "</ul></body></html>" >> "$IMMUN_DIR/versions.html"
+
+            find "$TARGET_DIR" -type d -exec chmod 755 {} \;
+            find "$TARGET_DIR" -type f -exec chmod 644 {} \;
+
+            echo "Staging deployment complete. current/ -> $TARGET_DIR"
