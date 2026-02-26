@@ -24,7 +24,7 @@ jobs:
       NODE_VERSION: "18"
       RUBY_VERSION: "3.1"
 
-      IG_PUBLISHER_VERSION: "1.0.0"  
+      IG_PUBLISHER_VERSION: "latest" # or pin e.g. "1.7.25" if you want reproducibility
 
       LOCAL_PKG_PATH: "tools/package/fhir.ph.core#1.0.0/package"
       LOCAL_PKG_ID: "fhir.ph.core#1.0.0"
@@ -55,6 +55,13 @@ jobs:
       - name: Install SUSHI
         run: npm install -g fsh-sushi
 
+      # Basic repo lint (safe, fast)
+      # - name: YAML/Markdown/Shell lint 
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y shellcheck
+      #     # add your lint commands here
+
       - name: Cache publisher + packages
         uses: actions/cache@v4
         with:
@@ -70,10 +77,18 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p input-cache
-              curl -fsSL \
-                "https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar" \
-                -o "input-cache/publisher.jar"
-              java -jar input-cache/publisher.jar -v || true
+
+          if [ "${IG_PUBLISHER_VERSION}" = "latest" ]; then
+            curl -fsSL \
+              "https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar" \
+              -o "input-cache/publisher.jar"
+          else
+            curl -fsSL \
+              "https://github.com/HL7/fhir-ig-publisher/releases/download/${IG_PUBLISHER_VERSION}/publisher.jar" \
+              -o "input-cache/publisher.jar"
+          fi
+
+          java -jar input-cache/publisher.jar -v || true
 
       - name: Install Local FHIR Package
         run: |
@@ -141,7 +156,7 @@ jobs:
     name: CD - Deploy Dev
     needs: [ci]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     environment: dev
 
     steps:
