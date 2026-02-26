@@ -70,13 +70,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p input-cache
-          if [ ! -f input-cache/publisher-${IG_PUBLISHER_VERSION}.jar ]; then
-            curl -fsSL \
-              "https://github.com/HL7/fhir-ig-publisher/releases/download/${IG_PUBLISHER_VERSION}/publisher.jar" \
-              -o "input-cache/publisher-${IG_PUBLISHER_VERSION}.jar"
-          fi
-          ln -sf "publisher-${IG_PUBLISHER_VERSION}.jar" input-cache/publisher.jar
-          java -jar input-cache/publisher.jar -v || true
+              curl -fsSL \
+                "https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar" \
+                -o "input-cache/publisher.jar"
+              java -jar input-cache/publisher.jar -v || true
 
       - name: Install Local FHIR Package
         run: |
