@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   ci:
-    name: CI - Build & Test (PR)
+    name: CI - Build & QA (PR)
     runs-on: ubuntu-latest
 
     steps:
@@ -89,7 +89,6 @@ jobs:
             exit 1
           fi
 
-      # ✅ Put your real automated tests here
       - name: Run tests
         run: |
           echo "No tests configured yet."
@@ -99,8 +98,8 @@ jobs:
           # ./gradlew test
           # pytest -q
 
-      # Optional lint/format/security checks
-      - name: Lint / format (optional)
+      # lint/format/security checks
+      - name: Lint / format
         run: |
           echo "Add lint/format here if you have tooling."
           # Examples:
@@ -173,13 +172,25 @@ jobs:
             exit 1
           fi
 
+      - name: Add VERSION files
+        run: |
+          echo "${GITHUB_SHA}" > output/VERSION.txt
+          echo "<html><body>Current IG version: ${GITHUB_SHA}</body></html>" > output/version.html
+
       - name: Fix Permissions
         run: |
           find output -type d -exec chmod 755 {} \;
           find output -type f -exec chmod 644 {} \;
 
-      - name: Upload versioned IG
-        uses: appleboy/scp-action@v0.1.1
+      - name: Check QA report
+        run: |
+          if [ -f output/qa.html ] && grep -q "ERROR" output/qa.html; then
+            echo "IG Publisher QA errors found"
+            exit 1
+          fi
+
+      - name: Upload versioned IG (direct)
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.ADMIN_HOST }}
           username: ${{ secrets.ADMIN_USER }}
@@ -187,8 +198,10 @@ jobs:
           port: ${{ secrets.ADMIN_PORT }}
           source: "output/*"
           target: "/var/www/html/Dev/Immunization/${{ github.sha }}"
+          overwrite: true
+          debug: true
 
-      - name: Update current IG
+      - name: Update current + versions.html
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.ADMIN_HOST }}
@@ -196,29 +209,32 @@ jobs:
           key: ${{ secrets.ADMIN_KEY }}
           port: ${{ secrets.ADMIN_PORT }}
           script: |
-            SHA=${{ github.sha }}
-            IMMUN_DIR=/var/www/html/Dev/Immunization
-            TARGET_DIR=$IMMUN_DIR/$SHA
-            CURRENT_LINK=$IMMUN_DIR/current
+            set -e
+
+            SHA="${{ github.sha }}"
+            IMMUN_DIR="/var/www/html/Dev/Immunization"
+            TARGET_DIR="$IMMUN_DIR/$SHA"
+            CURRENT_LINK="$IMMUN_DIR/current"
 
             if [ ! -d "$TARGET_DIR" ]; then
               echo "ERROR: Versioned folder does not exist: $TARGET_DIR"
               exit 1
             fi
 
-            find "$TARGET_DIR" -type d -exec chmod 755 {} \;
-            find "$TARGET_DIR" -type f -exec chmod 644 {} \;
-
+            # Update current symlink
             rm -f "$CURRENT_LINK"
             ln -s "$TARGET_DIR" "$CURRENT_LINK"
 
-            echo "$SHA" > $IMMUN_DIR/VERSION.txt
-            echo "<html><body>Current IG version: $SHA</body></html>" > $IMMUN_DIR/version.html
+            # Root VERSION files
+            echo "$SHA" > "$IMMUN_DIR/VERSION.txt"
+            echo "<html><body>Current IG version: $SHA</body></html>" > "$IMMUN_DIR/version.html"
 
-            echo "<html><body><h2>FHIR IG Versions</h2><ul>" > $IMMUN_DIR/versions.html
-            echo "<li><a href='current/index.html'>Current version</a></li>" >> $IMMUN_DIR/versions.html
-            for d in $(ls -1 $IMMUN_DIR | grep -E '^[0-9a-f]{40}$'); do
-              echo "<li><a href='$d/index.html'>$d</a></li>" >> $IMMUN_DIR/versions.html
+            # versions.html
+            echo "<html><body><h2>FHIR IG Versions</h2><ul>" > "$IMMUN_DIR/versions.html"
+            echo "<li><a href='current/index.html'>Current version</a></li>" >> "$IMMUN_DIR/versions.html"
+            for d in $(ls -1 "$IMMUN_DIR" | grep -E '^[0-9a-f]{40}$' || true); do
+              echo "<li><a href='$d/index.html'>$d</a></li>" >> "$IMMUN_DIR/versions.html"
             done
-            echo "</ul></body></html>" >> $IMMUN_DIR/versions.html
+            echo "</ul></body></html>" >> "$IMMUN_DIR/versions.html"
+
             echo "Deployment complete. current/ points to $TARGET_DIR"
