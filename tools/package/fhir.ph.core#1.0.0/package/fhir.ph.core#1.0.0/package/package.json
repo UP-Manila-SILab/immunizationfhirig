@@ -1,0 +1,29 @@
+{
+  "name" : "fhir.ph.core",
+  "version" : "0.1.0",
+  "tools-version" : 3,
+  "type" : "IG",
+  "date" : "20260220031013",
+  "license" : "CC-BY-1.0",
+  "canonical" : "http://doh.gov.ph/fhir/ph-core",
+  "notForPublication" : true,
+  "url" : "file://C:\\Users\\Jaylord\\IG\\ph-core\\output",
+  "title" : "Draft PH Core Implementation Guide",
+  "description" : "This implementation guide is provided to support the use of FHIR®© in an Philippines context, and defines the minimum set of constraints on the FHIR resources to create the PH Core profiles. This implementation guide forms the foundation to build future PH Realm FHIR implementation guides and its content will continue to grow to meet the needs of PH implementers. (built Fri, Feb 20, 2026 03:10+0800+08:00)",
+  "fhirVersions" : ["4.0.1"],
+  "dependencies" : {
+    "hl7.fhir.r4.core" : "4.0.1",
+    "hl7.terminology.r4" : "7.0.1",
+    "hl7.fhir.uv.extensions.r4" : "5.2.0"
+  },
+  "author" : "UP Manila National TeleHealth Center",
+  "maintainers" : [{
+    "name" : "UP Manila National TeleHealth Center",
+    "url" : "https://github.com/UP-NTHC"
+  }],
+  "directories" : {
+    "lib" : "package",
+    "example" : "example"
+  },
+  "jurisdiction" : "urn:iso:std:iso:3166#PH"
+}

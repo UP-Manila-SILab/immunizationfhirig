@@ -152,8 +152,6 @@ jobs:
           name: ig-output
           path: output
 
-
-          
   deploy_dev:
     name: CD - Deploy Dev
     needs: [ci]
