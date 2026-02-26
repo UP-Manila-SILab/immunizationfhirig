@@ -1,48 +1,48 @@
-name: Build and Publish FHIR IG
+name: Build, Test, and Deploy FHIR IG
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
-
   workflow_dispatch:
 
+concurrency:
+  group: fhir-ig-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  ci:
+    name: CI - Build & Test (PR)
     runs-on: ubuntu-latest
 
     steps:
-      #  Checkout repository
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      #  Setup Java (required for IG Publisher)
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      #  Setup Node.js (required for SUSHI)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # Setup Ruby 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: "3.1"
 
-      # Install Jekyll
       - name: Install Jekyll
         run: gem install jekyll bundler
-      #  Install SUSHI
+
       - name: Install SUSHI
         run: npm install -g fsh-sushi
 
-      #  Cache IG Publisher + packages
-      - name: Cache publisher
+      - name: Cache publisher + packages
         uses: actions/cache@v4
         with:
           path: |
@@ -52,7 +52,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fhir-
 
-      #  Download IG Publisher (if not cached)
       - name: Download IG Publisher
         run: |
           mkdir -p input-cache
@@ -60,62 +59,125 @@ jobs:
             curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
           fi
 
-      - name: Install Local FHIR Package # Generate the package from the local tools/package folder and copy it to the FHIR cache
+      - name: Install Local FHIR Package
         run: |
           mkdir -p ~/.fhir/packages/fhir.ph.core#1.0.0/package
           cp -r tools/package/fhir.ph.core#1.0.0/package/* ~/.fhir/packages/fhir.ph.core#1.0.0/package/
 
-      #  Run SUSHI (FSH → FHIR JSON)
       - name: Run SUSHI
         run: sushi . --log-level debug
 
-      #  Run IG Publisher
       - name: Build IG
         run: |
-            java -jar input-cache/publisher.jar publisher -ig .
+          java -jar input-cache/publisher.jar publisher -ig .
+          if [ ! -d output ]; then
+            echo "IG Publisher did not create output/"
+            exit 1
+          fi
 
-             if [ ! -d output ]; then
-              echo "IG Publisher did not create output/"
-              exit 1
-             fi
-
-      # Fail if output folder is empty
       - name: Fail if output is empty
         run: |
           if [ ! -d output ] || [ -z "$(ls -A output)" ]; then
             echo "IG Publisher did not generate output files."
             exit 1
           fi
-      - name: Add VERSION files
+
+      - name: Check QA report
         run: |
-          echo "${GITHUB_SHA}" > output/VERSION.txt
-          echo "<html><body>Current IG version: ${GITHUB_SHA}</body></html>" > output/version.html
+          if grep -q "ERROR" output/qa.html; then
+            echo "IG Publisher QA errors found"
+            exit 1
+          fi
+
+      # ✅ Put your real automated tests here
+      - name: Run tests
+        run: |
+          echo "No tests configured yet."
+          # Examples (choose one if applicable):
+          # npm ci && npm test
+          # bundle exec rspec
+          # ./gradlew test
+          # pytest -q
+
+      # Optional lint/format/security checks
+      - name: Lint / format (optional)
+        run: |
+          echo "Add lint/format here if you have tooling."
+          # Examples:
+          # npm run lint
+          # npm run format:check
+          # gem install rubocop && rubocop
+
+  deploy:
+    name: CD - Deploy to Server (main only)
+    runs-on: ubuntu-latest
+    needs: [ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1"
+
+      - name: Install Jekyll
+        run: gem install jekyll bundler
+
+      - name: Install SUSHI
+        run: npm install -g fsh-sushi
+
+      - name: Cache publisher + packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            input-cache
+            ~/.fhir/packages
+          key: ${{ runner.os }}-fhir-${{ hashFiles('**/sushi-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-fhir-
+
+      - name: Download IG Publisher
+        run: |
+          mkdir -p input-cache
+          if [ ! -f input-cache/publisher.jar ]; then
+            curl -L https://github.com/HL7/fhir-ig-publisher/releases/latest/download/publisher.jar -o input-cache/publisher.jar
+          fi
+
+      - name: Install Local FHIR Package
+        run: |
+          mkdir -p ~/.fhir/packages/fhir.ph.core#1.0.0/package
+          cp -r tools/package/fhir.ph.core#1.0.0/package/* ~/.fhir/packages/fhir.ph.core#1.0.0/package/
+
+      - name: Run SUSHI
+        run: sushi . --log-level debug
+
+      - name: Build IG
+        run: |
+          java -jar input-cache/publisher.jar publisher -ig .
+          if [ ! -d output ]; then
+            echo "IG Publisher did not create output/"
+            exit 1
+          fi
 
       - name: Fix Permissions
         run: |
           find output -type d -exec chmod 755 {} \;
           find output -type f -exec chmod 644 {} \;
 
-      # Fail build if QA errors exist 
-      - name: Check QA report
-        run: |
-          if grep -q "ERROR" output/qa.html; then
-            echo " IG Publisher QA errors found"
-            exit 1
-          fi
-
-      # Debug IG output locally
-      - name: Debug IG output
-        run: |
-          echo "Top-level files in output:"
-          ls -la output
-          echo "Recursive listing of all files:"
-          find output -type f
-
-      - name: Set commit SHA
-        run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
-      
-      # Upload IG to versioned folder
       - name: Upload versioned IG
         uses: appleboy/scp-action@v0.1.1
         with:
@@ -126,8 +188,6 @@ jobs:
           source: "output/*"
           target: "/var/www/html/Dev/Immunization/${{ github.sha }}"
 
-
-      # Deploy IG recursively via SSH
       - name: Update current IG
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -146,29 +206,19 @@ jobs:
               exit 1
             fi
 
-            # Fix permissions inside the versioned folder (safe for non-root)
             find "$TARGET_DIR" -type d -exec chmod 755 {} \;
             find "$TARGET_DIR" -type f -exec chmod 644 {} \;
 
-            # Update current symlink
             rm -f "$CURRENT_LINK"
             ln -s "$TARGET_DIR" "$CURRENT_LINK"
 
-            # Write VERSION files
             echo "$SHA" > $IMMUN_DIR/VERSION.txt
             echo "<html><body>Current IG version: $SHA</body></html>" > $IMMUN_DIR/version.html
 
-            # Generate versions.html
             echo "<html><body><h2>FHIR IG Versions</h2><ul>" > $IMMUN_DIR/versions.html
             echo "<li><a href='current/index.html'>Current version</a></li>" >> $IMMUN_DIR/versions.html
-
-            # List all versioned folders
             for d in $(ls -1 $IMMUN_DIR | grep -E '^[0-9a-f]{40}$'); do
               echo "<li><a href='$d/index.html'>$d</a></li>" >> $IMMUN_DIR/versions.html
             done
-
             echo "</ul></body></html>" >> $IMMUN_DIR/versions.html
-
             echo "Deployment complete. current/ points to $TARGET_DIR"
-            echo "versions.html generated with links to all deployed IG versions"
-          
